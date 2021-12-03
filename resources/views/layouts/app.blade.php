@@ -276,6 +276,13 @@
             @component('componentes.navbarAdministrador')
             @endcomponent
         @endif
+
+        <!-- Se o usuário for um bibliotecario -->
+        @if(Auth::user()->tipo == 'bibliotecario')
+            <!-- carrega o componente contendo Navbar do bibliotecario -->
+            @component('componentes.navbarBibliotecario')
+            @endcomponent
+        @endif
     @endif
     @yield('conteudo')
   <!-- rodape -->

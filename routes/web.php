@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,9 @@ Auth::routes(['verify' => true]);
 // ---------------------------------------------ALUNO-------------------------------------------------------------------
 Route::get('/cadastro',[\App\Http\Controllers\AlunoController::class,'createAluno'])->name('cadastro');
 Route::post('/cadastro',[\App\Http\Controllers\AlunoController::class,'storeAluno'])->name('cadastro');
+
+// ---------------------------------------------BIBLIOTECARIO-------------------------------------------------------------------
+Route::get('/cadastro-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'createBibliotecario'])->name('cadastro-bibliotecario');
 
 //----------------------------------------------ADMINISTRADOR-----------------------------------------------------------
 Route::group(['middleware'=> ['CheckAdministrador', 'verified']], function(){
@@ -77,6 +81,13 @@ Route::group(['middleware'=> 'CheckAluno'], function(){
     Route::get('/formulario-requisicao',[\App\Http\Controllers\RequisicaoController::class, 'index'])->name('formulario-requisicao')->middleware('CheckAluno');
     Route::post('/formulario-requisicao',[\App\Http\Controllers\RequisicaoController::class, 'storeRequisicao'])->name('formulario-requisicao-post')->middleware('CheckAluno');
 });
+
+//----------------------------------------------BIBLIOTECARIO---------------------------------------------------
+// Route::group(['middleware'=> 'verified'], function(){
+Route::group(['middleware'=> 'CheckBibliotecario'], function(){
+    Route::get('/home-bibliotecario', [\App\Http\Controllers\BibliotecarioController::class, 'index'])->name('home-bibliotecario')->middleware('CheckBibliotecario');
+});
+
 // });
 // ---------------------------------------REQUISICAO------------------------------------------------------------------
 Route::get('/home', [\App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('verified');

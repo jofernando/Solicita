@@ -32,5 +32,23 @@ class UsuarioSeeder extends Seeder
           'password'=>Hash::make('123456'),
           'tipo'=>'aluno'
         ]);
+
+        DB::table('users')->insert([
+
+          'name'=>'bibliotecario',
+          'email'=>'bibliotecario@ufrpe.br',
+          'password'=>Hash::make('123456'),
+          'tipo'=>'bibliotecario',
+          'email_verified_at'=>'2020-01-01'
+        ]);
+
+        DB::table('users')->insert([
+
+          'name'=>'bibliotecarioX',
+          'email'=>'bibliotecarioX@ufrpe.br',
+          'password'=>Hash::make('123456'),
+          'tipo'=>'bibliotecario',
+          'email_verified_at'=>'2020-01-01'
+        ]);
     }
 }

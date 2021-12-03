@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Auth;
 use App\Models\Curso;
 use App\Models\Requisicao_documento;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -68,6 +68,10 @@ class HomeController extends Controller
 
           else if (Auth::user()->tipo == 'administrador') {
           return view('autenticacao.home-administrador');
+          }
+
+          else if (Auth::user()->tipo == 'bibliotecario') {
+          return view('autenticacao.home-bibliotecario');
           }
         }
       //
