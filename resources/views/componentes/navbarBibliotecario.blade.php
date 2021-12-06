@@ -46,7 +46,7 @@
           <a @if(Auth::user()->email_verified_at != '') href="{{ route('home') }}" onclick="event.preventDefault();document.getElementById('usuario-form').submit();" @endif class="nav-link" style="color:white ; margin-right:20px">
              {{Auth::user()->name}}
           </a>
-          <form id="usuario-form" action="{{ route('perfil-aluno') }}" method="GET" style="display: none;">
+          <form id="usuario-form" action="{{ route('perfil-bibliotecario') }}" method="GET" style="display: none;">
               @csrf
           </form>
         </li>

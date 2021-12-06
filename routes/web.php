@@ -24,6 +24,7 @@ Route::post('/cadastro',[\App\Http\Controllers\AlunoController::class,'storeAlun
 
 // ---------------------------------------------BIBLIOTECARIO-------------------------------------------------------------------
 Route::get('/cadastro-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'createBibliotecario'])->name('cadastro-bibliotecario');
+Route::post('/criar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'storeBibliotecario'])->name('criar-bibliotecario');
 
 //----------------------------------------------ADMINISTRADOR-----------------------------------------------------------
 Route::group(['middleware'=> ['CheckAdministrador', 'verified']], function(){
@@ -86,6 +87,11 @@ Route::group(['middleware'=> 'CheckAluno'], function(){
 // Route::group(['middleware'=> 'verified'], function(){
 Route::group(['middleware'=> 'CheckBibliotecario'], function(){
     Route::get('/home-bibliotecario', [\App\Http\Controllers\BibliotecarioController::class, 'index'])->name('home-bibliotecario')->middleware('CheckBibliotecario');
+    Route::get('/perfil-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'perfil'])->name('perfil-bibliotecario')->middleware('CheckBibliotecario');
+    Route::get('/editar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'editarBibliotecario'])->name('editar-bibliotecario')->middleware('CheckBibliotecario');
+    Route::post('/atualizar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'atualizarBibliotecario'])->name('atualizar-bibliotecario')->middleware('CheckBibliotecario');
+    Route::get('/editar-senha-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'editarSenha'])->name('editar-senha-bibliotecario')->middleware('CheckBibliotecario');
+    Route::post('/atualizar-senha-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'atualizarSenha'])->name('atualizar-senha-bibliotecario')->middleware('CheckBibliotecario');
 });
 
 // });

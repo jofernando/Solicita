@@ -12,7 +12,7 @@
           <div class="row justify-content-center">
             <h2>Cadastrar Servidor</h2>
           </div>
-          <form action="{{  route('confirmacao-servidor')  }}" method="POST">
+          <form action="{{  route('criar-bibliotecario')  }}" method="POST">
             @csrf
             <div class="row justify-content-center">
               <div class="col-sm-12">
@@ -111,7 +111,7 @@
                 </div>
 
                 <div class="col-sm-6">
-                    <button type="submit" class="btn lmts-primary btn-cadastro-primary" href="{{  route('confirmacao-servidor')}}"
+                    <button type="submit" class="btn lmts-primary btn-cadastro-primary"
                     onclick="confirmacaoCadastro();">
                         {{ __('Cadastrar') }}
                     </button>
