@@ -26,6 +26,10 @@ Route::post('/cadastro',[\App\Http\Controllers\AlunoController::class,'storeAlun
 Route::get('/cadastro-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'createBibliotecario'])->name('cadastro-bibliotecario');
 Route::post('/criar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'storeBibliotecario'])->name('criar-bibliotecario');
 
+// ---------------------------------------------BIBLIOTECA-------------------------------------------------------------------
+Route::get('/cadastro-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'createBiblioteca'])->name('cadastro-biblioteca');
+Route::post('/criar-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'storeBiblioteca'])->name('criar-biblioteca');
+
 //----------------------------------------------ADMINISTRADOR-----------------------------------------------------------
 Route::group(['middleware'=> ['CheckAdministrador', 'verified']], function(){
     Route::get('/home-administrador',[\App\Http\Controllers\AdministradorController::class, 'index'])->name('home-administrador')->middleware('CheckAdministrador');
@@ -92,6 +96,11 @@ Route::group(['middleware'=> 'CheckBibliotecario'], function(){
     Route::post('/atualizar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'atualizarBibliotecario'])->name('atualizar-bibliotecario')->middleware('CheckBibliotecario');
     Route::get('/editar-senha-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'editarSenha'])->name('editar-senha-bibliotecario')->middleware('CheckBibliotecario');
     Route::post('/atualizar-senha-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class, 'atualizarSenha'])->name('atualizar-senha-bibliotecario')->middleware('CheckBibliotecario');
+});
+
+//----------------------------------------------BIBLIOTECA---------------------------------------------------
+Route::group(['middleware'=> 'CheckBiblioteca'], function(){
+    Route::get('/home-bibliotecario', [\App\Http\Controllers\BibliotecarioController::class, 'index'])->name('home-bibliotecario')->middleware('CheckBibliotecario');
 });
 
 // });
