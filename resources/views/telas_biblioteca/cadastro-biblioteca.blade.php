@@ -16,34 +16,15 @@
             @csrf
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <label for="name" class="field a-field a-field_a3 page__field ">
-                <input id="nomeServidor" type="name" class="form-control @error('name') is-invalid @enderror field__input a-field__input"
-                name="name" value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="Nome Completo">
+                <label for="nome" class="field a-field a-field_a3 page__field ">
+                <input id="nome" type="name" class="form-control @error('nome') is-invalid @enderror field__input a-field__input"
+                name="nome" value="{{ old('nome') }}" required autocomplete="nome" autofocus placeholder="Nome Completo">
 
                 <span class="a-field__label-wrap">
                     <span class="a-field__label">Nome</span>
                 </span>
                 </label>
                 @error('name')
-                <span class="invalid-feedback" role="alert" style="overflow: visible; display:block">
-                <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-              </div>
-            </div>
-
-
-            <div class="row justify-content-center">
-              <div class="col-sm-12">
-                <label for="email" class="field a-field a-field_a3 page__field ">
-                <input id="emailServidor" type="email" class="form-control @error('email') is-invalid @enderror field__input a-field__input"
-                name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="E-Mail">
-
-                <span class="a-field__label-wrap">
-                    <span class="a-field__label">E-mail</span>
-                </span>
-                </label>
-                @error('email')
                 <span class="invalid-feedback" role="alert" style="overflow: visible; display:block">
                 <strong>{{ $message }}</strong>
                 </span>

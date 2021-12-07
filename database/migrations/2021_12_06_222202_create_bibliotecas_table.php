@@ -13,7 +13,7 @@ class CreateBibliotecasTable extends Migration
      */
     public function up()
     {
-        Schema::create('biblioteca', function (Blueprint $table) {
+        Schema::create('bibliotecas', function (Blueprint $table) {
             $table->id();
             $table->string('nome')->unique();
             $table->timestamps();

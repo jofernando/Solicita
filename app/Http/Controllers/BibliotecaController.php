@@ -13,35 +13,23 @@ class BibliotecaController extends Controller
      // Redireciona para tela de login ao entrar no sistema
   public function index()
   {
-    // return view('autenticacao.home-aluno');
-    if(Auth::user()){
-      return redirect()->route('home');
-    }
-    return view('autenticacao.login');
+    //return view('biblioteca.listar');
   }
 
   public function createBiblioteca()
   {
-    return view('autenticacao.cadastro-biblioteca');
+    return view('telas_biblioteca.cadastro-biblioteca');
   }
 
 
   public function storeBiblioteca(Request $request) {
     $request->validate([
-      'name' => 'required|string|max:255',
-      'email' => 'required|string|email|max:255|unique:users',
+      'nome' => 'required|string|max:255',
     ]);
-    $usuario = new User();
-    $usuario->name = $request->input('name');
-    $usuario->email = $request->input('email');
-    $usuario->tipo = 'biblioteca';
-    $usuario->save();
-  //INSTANCIA DO BIBLIOTECA
     $biblioteca = new Biblioteca();
-    $biblioteca->user_id = $usuario->id;
+    $biblioteca->nome = $request->nome;
     $biblioteca->save();
-    $usuario->sendEmailVerificationNotification();
-    return redirect()->route('home')->with('success', 'Biblioteca cadastrado com sucesso!');
+    return redirect()->route('home')->with('success', 'Biblioteca cadastrada com sucesso!');
   }
 
   public function editarBiblioteca(){
