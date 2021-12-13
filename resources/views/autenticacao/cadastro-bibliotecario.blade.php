@@ -102,7 +102,24 @@
                 </span>
                 @enderror
               </div>
-            </div>
+            </div></br>
+              <div class="col-sm-4">
+                  <!-- Bibliotecas-->
+                  <label for="bibliotecas">Biblioteca</label>
+                  <select name="biblioteca" id="bibliotecas" class="browser-default custom-select">
+
+                      <option value="" disable selected hidden>-- Selecionar biblioteca --</option>
+                      @foreach($bibliotecas as $biblioteca)
+                          <option value="{{$biblioteca->id}}">{{$biblioteca->nome}}</option>
+                      @endforeach
+
+                      @error('bibliotecas')
+                      <span class="invalid-feedback" role="alert" style="overflow: visible; display:block">
+                                    <strong>{{ $message }}</strong>
+                                    </span>
+                      @enderror
+                  </select>
+              </div>
 
             <!-- Botões -->
             <div class="form-group row justify-content-center" style="margin-top:60px">

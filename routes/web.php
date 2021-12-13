@@ -22,20 +22,16 @@ Auth::routes(['verify' => true]);
 Route::get('/cadastro',[\App\Http\Controllers\AlunoController::class,'createAluno'])->name('cadastro');
 Route::post('/cadastro',[\App\Http\Controllers\AlunoController::class,'storeAluno'])->name('cadastro');
 
-// ---------------------------------------------BIBLIOTECARIO-------------------------------------------------------------------
-Route::get('/cadastro-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'createBibliotecario'])->name('cadastro-bibliotecario');
-Route::post('/criar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'storeBibliotecario'])->name('criar-bibliotecario');
-
-// ---------------------------------------------BIBLIOTECA-------------------------------------------------------------------
-Route::get('/cadastro-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'createBiblioteca'])->name('cadastro-biblioteca');
-Route::post('/criar-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'storeBiblioteca'])->name('criar-biblioteca');
-
 //----------------------------------------------ADMINISTRADOR-----------------------------------------------------------
 Route::group(['middleware'=> ['CheckAdministrador', 'verified']], function(){
     Route::get('/home-administrador',[\App\Http\Controllers\AdministradorController::class, 'index'])->name('home-administrador')->middleware('CheckAdministrador');
     Route::get('/cadastro-servidor',[\App\Http\Controllers\ServidorController::class, 'homeServidor'])->name('cadastro-servidor')->middleware('CheckAdministrador');
     Route::post('/confirmacao-servidor',[\App\Http\Controllers\ServidorController::class, 'storeServidor'])->name('confirmacao-servidor')->middleware('CheckAdministrador');
     Route::get('/cancela-cadastro',[\App\Http\Controllers\ServidorController::class, 'cancel'])->name('cancela-cadastro')->middleware('CheckAdministrador');
+    Route::get('/cadastro-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'createBiblioteca'])->name('cadastro-biblioteca');
+    Route::post('/criar-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'storeBiblioteca'])->name('criar-biblioteca');
+    Route::get('/cadastro-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'createBibliotecario'])->name('cadastro-bibliotecario');
+    Route::post('/criar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'storeBibliotecario'])->name('criar-bibliotecario');
 });
 
 //----------------------------------------------SERVIDOR----------------------------------------------------------------

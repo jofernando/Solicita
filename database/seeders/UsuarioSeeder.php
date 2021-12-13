@@ -30,7 +30,8 @@ class UsuarioSeeder extends Seeder
           'name'=>'aluno',
           'email'=>'aluno@gmail',
           'password'=>Hash::make('123456'),
-          'tipo'=>'aluno'
+          'tipo'=>'aluno',
+            'email_verified_at'=>'2020-01-01'
         ]);
 
         DB::table('users')->insert([

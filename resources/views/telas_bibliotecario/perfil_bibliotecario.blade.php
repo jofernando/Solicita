@@ -15,13 +15,17 @@
             <h4>{{Auth::user()->name}}</h4>
           </div>
           <div class="col-sm-4">
-            <label for="nome">Matricula</label> 
+            <label for="nome">Matricula</label>
             <h4>{{$bibliotecario->matricula}}</h4>
           </div>
           <div class="col-sm-4">
             <label for="nome">E-mail</label>
             <h4>{{$user->email}}</h4>
           </div>
+            <div class="col-sm-4">
+                <label for="biblioteca">Biblioteca</label>
+                <h4>{{$bibliotecaBibliotecario->nome}}</h4>
+            </div>
         </div>
 
       </div>

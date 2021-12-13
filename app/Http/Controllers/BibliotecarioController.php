@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Biblioteca;
 use App\Models\Bibliotecario;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ class BibliotecarioController extends Controller
     // Redireciona para tela de login ao entrar no sistema
   public function index()
   {
+
     // return view('autenticacao.home-aluno');
     if(Auth::user()){
       return redirect()->route('home');
@@ -22,7 +24,8 @@ class BibliotecarioController extends Controller
 
   public function createBibliotecario()
   {
-    return view('autenticacao.cadastro-bibliotecario');
+      $bibliotecas = Biblioteca::All();
+    return view('autenticacao.cadastro-bibliotecario',compact('bibliotecas'));
   }
 
   public function perfil()
@@ -30,9 +33,11 @@ class BibliotecarioController extends Controller
     $idUser = Auth::user()->id;
       $user = User::find($idUser); //Usuário Autenticado
     $bibliotecario = Bibliotecario::where('user_id',$idUser)->first(); //Bibliotecario autenticado
+      $perfil = Perfil::where('bibliotecario_id',$bibliotecario->id)->first();
+      $bibliotecaBibliotecario = Biblioteca::where('id',$perfil->biblioteca_id)->first();
     return view('telas_bibliotecario.perfil_bibliotecario', ['user'=>$user,
-    'bibliotecario'=>$bibliotecario]);
-    
+    'bibliotecario'=>$bibliotecario,'perfil'=>$perfil,'bibliotecaBibliotecario'=>$bibliotecaBibliotecario]);
+
   }
 
   public function storeBibliotecario(Request $request) {
@@ -41,6 +46,7 @@ class BibliotecarioController extends Controller
       'matricula' => 'required|unique:bibliotecarios|numeric|digits_between:1,10',
       'email' => 'required|string|email|max:255|unique:users',
       'password' => 'required|string|min:8|confirmed',
+        'biblioteca' => ['required'],
     ]);
     $usuario = new User();
     $usuario->name = $request->input('name');
@@ -48,6 +54,9 @@ class BibliotecarioController extends Controller
     $usuario->password = Hash::make($request->input('password'));
     $usuario->tipo = 'bibliotecario';
     $usuario->save();
+
+    // biblioteca
+      $biblioteca = Biblioteca::where('id',$request->bibliotecas)->first();
   //INSTANCIA DO BIBLIOTECARIO
     $bibliotecario = new Bibliotecario();
     $bibliotecario->matricula = $request->input('matricula');

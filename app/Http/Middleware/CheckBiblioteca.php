@@ -19,7 +19,7 @@ class CheckBiblioteca
       if(!Auth::check()){
         return redirect('/')->with('error', 'É necessário estar logado para utilizar esta funcionalidade');
       }
-      if(Auth::user()->tipo=='biblioteca'){
+      if(Auth::user()->tipo=='admin'){
         return $next($request);
       }
       else{

@@ -16,7 +16,7 @@
             </div>
             <form method="POST" enctype="multipart/form-data" id="formRequisicao" action="{{ route('confirmacao-requisicao') }}">
               @csrf
-              
+
               <div class="form-group row justify-content-center">
                 <div class="col-sm-12">
 
@@ -58,7 +58,6 @@
                   <div>
                     <input type="checkbox" name="programaDisciplina"    value="Programa de Disciplina"    id="programaDisciplina"
                       onclick="checaSelecaoProgramaDisciplina()"> Programa de Disciplina (informar abaixo o nome da disciplina e a finalidade).</input>
-
                   </br>
                       <textarea maxlength="255" class="form-control @error('programaDisciplina') is-invalid @enderror @error('requisicaoPrograma') is-invalid @enderror"
                                 form ="formRequisicao" style="display:none; margin-top:10px;" name="requisicaoPrograma" cols="115" id="textareaProgramaDisciplina"
@@ -78,6 +77,10 @@
                           </span>
                         </span>
                       @enderror
+                    </div>
+                    {{-- Ficha Catalográfica --}}
+                    <div>
+                        <input type="checkbox" name="" value="" id=""> Ficha Catalográfica </input></br>
                     </div>
                     {{-- outros  --}}
                     <div>
@@ -113,9 +116,9 @@
 
                 </div>
               </div>
-                  
-                
-            
+
+
+
             </form>
 
         </div>
