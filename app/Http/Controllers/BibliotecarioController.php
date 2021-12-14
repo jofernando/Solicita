@@ -33,10 +33,10 @@ class BibliotecarioController extends Controller
     $idUser = Auth::user()->id;
       $user = User::find($idUser); //Usuário Autenticado
     $bibliotecario = Bibliotecario::where('user_id',$idUser)->first(); //Bibliotecario autenticado
-      $perfil = Perfil::where('bibliotecario_id',$bibliotecario->id)->first();
-      $bibliotecaBibliotecario = Biblioteca::where('id',$perfil->biblioteca_id)->first();
+      $biblioteca = Biblioteca::where('id',$bibliotecario->biblioteca_id)->first();
+
     return view('telas_bibliotecario.perfil_bibliotecario', ['user'=>$user,
-    'bibliotecario'=>$bibliotecario,'perfil'=>$perfil,'bibliotecaBibliotecario'=>$bibliotecaBibliotecario]);
+    'bibliotecario'=>$bibliotecario,'biblioteca'=>$biblioteca]);
 
   }
 
@@ -46,7 +46,7 @@ class BibliotecarioController extends Controller
       'matricula' => 'required|unique:bibliotecarios|numeric|digits_between:1,10',
       'email' => 'required|string|email|max:255|unique:users',
       'password' => 'required|string|min:8|confirmed',
-        'biblioteca' => ['required'],
+        'biblioteca' => 'required',
     ]);
     $usuario = new User();
     $usuario->name = $request->input('name');
@@ -61,6 +61,7 @@ class BibliotecarioController extends Controller
     $bibliotecario = new Bibliotecario();
     $bibliotecario->matricula = $request->input('matricula');
     $bibliotecario->user_id = $usuario->id;
+    $bibliotecario->biblioteca_id =$request->input('biblioteca');
     $bibliotecario->save();
     $usuario->sendEmailVerificationNotification();
     return redirect()->route('home')->with('success', 'Bibliotecario cadastrado com sucesso!');

@@ -10,7 +10,7 @@
         <div class="card-body">
 
           <div class="row justify-content-center">
-            <h2>Cadastrar Servidor</h2>
+            <h2>Cadastrar Bibliotecário</h2>
           </div>
           <form action="{{  route('criar-bibliotecario')  }}" method="POST">
             @csrf
@@ -103,7 +103,7 @@
                 @enderror
               </div>
             </div></br>
-              <div class="col-sm-4">
+              <div class="col-sm-12">
                   <!-- Bibliotecas-->
                   <label for="bibliotecas">Biblioteca</label>
                   <select name="biblioteca" id="bibliotecas" class="browser-default custom-select">

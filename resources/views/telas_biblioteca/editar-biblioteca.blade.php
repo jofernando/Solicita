@@ -10,16 +10,16 @@
         <div class="card-body">
 
           <div class="row justify-content-center">
-            <h2>Cadastrar Biblioteca</h2>
+            <h2>Editar Biblioteca</h2>
           </div>
-          <form action="{{  route('criar-biblioteca')  }}" method="POST">
+          <form action="{{  route('atualizar-biblioteca')  }}" method="POST">
             @csrf
             <div class="row justify-content-center">
               <div class="col-sm-12">
                 <label for="nome" class="field a-field a-field_a3 page__field ">
                 <input id="nome" type="name" class="form-control @error('nome') is-invalid @enderror field__input a-field__input"
-                name="nome" value="{{ old('nome') }}" required autocomplete="nome" autofocus placeholder="Nome Completo">
-
+                name="nome" value="{{ $biblioteca->nome }}" required autocomplete="nome" autofocus placeholder="Nome Completo">
+                <input type="hidden" name="id_biblioteca" value="{{ $biblioteca->id }}">
                 <span class="a-field__label-wrap">
                     <span class="a-field__label">Nome</span>
                 </span>
@@ -40,7 +40,7 @@
 
                 <div class="col-sm-6">
                     <button type="submit" class="btn lmts-primary btn-cadastro-primary">
-                        {{ __('Cadastrar') }}
+                        {{ __('Alterar') }}
                     </button>
                 </div>
 

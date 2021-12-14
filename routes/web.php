@@ -32,6 +32,9 @@ Route::group(['middleware'=> ['CheckAdministrador', 'verified']], function(){
     Route::post('/criar-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'storeBiblioteca'])->name('criar-biblioteca');
     Route::get('/cadastro-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'createBibliotecario'])->name('cadastro-bibliotecario');
     Route::post('/criar-bibliotecario',[\App\Http\Controllers\BibliotecarioController::class,'storeBibliotecario'])->name('criar-bibliotecario');
+    Route::get('/editar-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'editarBiblioteca'])->name('editar-biblioteca');
+    Route::post('/editar-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'atualizarBiblioteca'])->name('atualizar-biblioteca');
+    Route::get('/listar-biblioteca',[\App\Http\Controllers\BibliotecaController::class,'listarBiblioteca'])->name('listar-biblioteca');
 });
 
 //----------------------------------------------SERVIDOR----------------------------------------------------------------

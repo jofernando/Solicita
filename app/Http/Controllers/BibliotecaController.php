@@ -32,30 +32,23 @@ class BibliotecaController extends Controller
     return redirect()->route('home')->with('success', 'Biblioteca cadastrada com sucesso!');
   }
 
-  public function editarBiblioteca(){
-    $idUser = Auth::user()->id;
-      $user = User::find($idUser); //Usuário Autenticado
-    $biblioteca = Biblioteca::where('user_id',$idUser)->first(); //Bibliotecario autenticado
-    return view('telas_biblioteca.editar_biblioteca', ['user'=>$user,
-    'biblioteca'=>$biblioteca]);
+  public function editarBiblioteca(Request $request){
+      $biblioteca = Biblioteca::find($request->id_biblioteca);
+    return view('telas_biblioteca.editar-biblioteca', ['biblioteca'=>$biblioteca]);
   }
   public function atualizarBiblioteca(Request $request){
-    //atualização dos dados
-    $user = Auth::user();
-    if($user->email!=$request->email){
-      $request->validate([
-        'email' => ['bail','required', 'string', 'email', 'max:255', 'unique:users'],
+      $biblioteca = Biblioteca::find($request->id_biblioteca);
+    $request->validate(['nome' => ['required'],
       ]);
-    }
-    $user->name = $request->name;
-    $user->email = $request->email;
-    $user->save();
-    //dados para ser exibido na view
-    $idUser = Auth::user()->id;
-    $user = User::find($idUser); //Usuário Autenticado
-    return redirect()->route('/')
-                                            ->with('success', 'Seus dados foram atualizados!');
+    $biblioteca->nome = $request->nome;
+    $biblioteca->save();
+    return redirect()->route('listar-biblioteca')
+                                            ->with('success', 'A biblioteca foi atualizada!');
   }
 
+    public function listarBiblioteca(){
+        $biblioteca = Biblioteca::all(); //Bibliotecario autenticado
+        return view('telas_biblioteca.listar-bibliotecas', ['bibliotecas'=>$biblioteca]);
+    }
 
 }

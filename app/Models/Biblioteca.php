@@ -10,8 +10,4 @@ class Biblioteca extends Model
     protected $fillable = ['nome'];
     use HasFactory;
 
-    public function perfil(){
-        return $this->hasMany('App\Models\Perfil');
-    }
-
 }

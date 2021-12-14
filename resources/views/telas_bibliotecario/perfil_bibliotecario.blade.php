@@ -10,21 +10,21 @@
       <div class="card-header"><h4>Informações do Bibliotecario</h4></div>
       <div class="card-body">
         <div class="row justify-content-center">
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             <label for="nome">Nome</label>
             <h4>{{Auth::user()->name}}</h4>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             <label for="nome">Matricula</label>
             <h4>{{$bibliotecario->matricula}}</h4>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             <label for="nome">E-mail</label>
             <h4>{{$user->email}}</h4>
           </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label for="biblioteca">Biblioteca</label>
-                <h4>{{$bibliotecaBibliotecario->nome}}</h4>
+                <h4>{{$biblioteca->nome}}</h4>
             </div>
         </div>
 

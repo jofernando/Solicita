@@ -19,6 +19,8 @@ class CreateBibliotecariosTable extends Migration
             $table->timestamps();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('biblioteca_id')->nullable();
+            $table->foreign('biblioteca_id')->references('id')->on('bibliotecas');
         });
     }
 
