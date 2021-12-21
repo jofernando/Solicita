@@ -60,8 +60,8 @@
 
                                 {{-- Ficha Catalográfica --}}
                                 <div>
-                                    <input type="radio" name="documento" value="ProgramaEduc" id="programaEduc">
-                                    Programa Educacional</input></br>
+                                    <input type="radio" name="documento" value="ProdutoEduc" id="produtoEduc">
+                                    Produto Educacional</input></br>
                                 </div>
                                 <div class="form-group row mb-0" style="margin-top:10px">
                                     <div class="col-md-8 offset-md-4">
