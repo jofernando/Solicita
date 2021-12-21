@@ -14,7 +14,7 @@ class DocumentoSeeder extends Seeder
      */
     public function run()
     {
-        $documentos = ['Declaração de Vínculo','Comprovante de Matrícula','Histórico','Programa de Disciplina','Outros'];
+        $documentos = ['Declaração de Vínculo','Comprovante de Matrícula','Histórico','Programa de Disciplina', 'Monografia', 'Tese', 'TCC', 'ProgramaEduc','Outros'];
 
         for ($i=0; $i < sizeof($documentos); $i++) {
 

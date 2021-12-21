@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,403 +22,445 @@ use App\Jobs\SendEmail;
 
 class RequisicaoController extends Controller
 {
-  public function index()
-  {
-    return view('autenticacao.formulario-requisicao');
-  }
-
-  public function excluirRequisicao($id){
-    $requisicao = Requisicao::find($id);
-    $documentos = $requisicao->requisicao_documento()->get();
-
-    foreach ($documentos as $doc) {
-      # code...
-      if($doc->status != 'Em andamento'){
-        return redirect()->back()->with('error', 'Você não pode excluir esta requisição, pois a mesma possui documentos que já foram processados.');
-      }
+    public function index()
+    {
+        return view('autenticacao.formulario-requisicao');
     }
-    $requisicao->requisicao_documento()->delete();
-    $requisicao->delete();
-    return redirect()->back()->with('success', 'Requisição excluída com sucesso!');
-  }
 
-  public function getRequisicoes(Request $request){
-    //$documento = Documento::where('id',$request->documento_id)->first();
-    $documento = Documento::where('id',$request->titulo_id)->first();
-    $curso = Curso::where('id',$request->curso_id)->first();
-    $cursoSelecionado = Curso::where('id',$request->curso_id)->first();
-    $documentoSelecionado = Documento::where('id',$request->titulo_id)->first();
-    $cursos = Curso::all();
-    $documentos = Documento::all();
-      //Verifica se o card clicado foi igual a "TODOS"
-                      // ->withTrashed()
-      if($request->titulo_id == 6){
-          $titulo = 'Concluídos';
-          //$id_documentos retorna um collection. É necessário transformar para array
-          //pega todas as requisições com base no id do documento e no id do curso
-          $id_documentos = DB::table('requisicao_documentos')
-                  ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
-                  ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
-                  ->select ('requisicao_documentos.id')
-                  ->where([['curso_id', $request->curso_id],['status','Concluído - Disponível para retirada']])
-                  ->get();
+    public function excluirRequisicao($id)
+    {
+        $requisicao = Requisicao::find($id);
+        $documentos = $requisicao->requisicao_documento()->get();
 
-      }
-      else if($request->titulo_id == 7){
-          $titulo = 'Indeferidos';
-          //$id_documentos retorna um collection. É necessário transformar para array
-          //pega todas as requisições com base no id do documento e no id do curso
-          $id_documentos = DB::table('requisicao_documentos')
-                  ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
-                  ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
-                  ->select ('requisicao_documentos.id')
-                  ->where([['curso_id', $request->curso_id],['status','Indeferido']])
-                  ->get();
+        foreach ($documentos as $doc) {
+            # code...
+            if ($doc->status != 'Em andamento') {
+                return redirect()->back()->with('error', 'Você não pode excluir esta requisição, pois a mesma possui documentos que já foram processados.');
+            }
+        }
+        $requisicao->requisicao_documento()->delete();
+        $requisicao->delete();
+        return redirect()->back()->with('success', 'Requisição excluída com sucesso!');
+    }
 
-      }
-      else {
-         $titulo = $documento->tipo;
-         $id_documentos = DB::table('requisicao_documentos')
+    public function getRequisicoes(Request $request)
+    {
+        //$documento = Documento::where('id',$request->documento_id)->first();
+        $documento = Documento::where('id', $request->titulo_id)->first();
+        $curso = Curso::where('id', $request->curso_id)->first();
+        $cursoSelecionado = Curso::where('id', $request->curso_id)->first();
+        $documentoSelecionado = Documento::where('id', $request->titulo_id)->first();
+        $cursos = Curso::all();
+        $documentos = Documento::all();
+        //Verifica se o card clicado foi igual a "TODOS"
+        // ->withTrashed()
+        if ($request->titulo_id == 6) {
+            $titulo = 'Concluídos';
+            //$id_documentos retorna um collection. É necessário transformar para array
+            //pega todas as requisições com base no id do documento e no id do curso
+            $id_documentos = DB::table('requisicao_documentos')
                 ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
                 ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
-                ->select ('requisicao_documentos.id')
-                ->where([['documento_id',$request->titulo_id],['curso_id', $request->curso_id],['status','Em andamento']])
+                ->select('requisicao_documentos.id')
+                ->where([['curso_id', $request->curso_id], ['status', 'Concluído - Disponível para retirada']])
                 ->get();
-      }
-      $id = []; //array auxiliar que pega cada item do $id_documentos
-      foreach ($id_documentos as $id_documento) {
-        array_push($id, $id_documento->id); //passa o id de $id_documentos para o array auxiliar $id
-      }
-      $listaRequisicao_documentos = Requisicao_documento::whereIn('id', $id)->get(); //Pega as requisições que possuem o id do curso
-      $response = [];
-      foreach ($listaRequisicao_documentos as $key) {
-        if($key->requisicao->perfil != null) {
-        array_push($response, ['id' => $key->id,
-                               'cpf' => $key->aluno->cpf,
-                               'perfil'=> $key->aluno->perfil,
-                               'nome' => $key->aluno->user->name,
-                               'curso' => $key->requisicao->perfil->curso->nome,
-                               'email' => $key->aluno->user->email,
-                               'vinculo' => $key->requisicao->perfil->situacao,
-                               'status_data' => $key->status_data,
-                               'status_hora' => Requisicao::where('id',$key->requisicao_id)->get('hora_pedido')[0]->hora_pedido,
-                               'status' => $key->status,
-                               'detalhes' => $key->detalhes,
-                               'requisicoes_documentos'=> $key
-                              ]);
-                            }
-      }
-      usort($response, function($a, $b){ return $a['nome'] >= $b['nome']; });
-      $listaRequisicao_documentos = $response;
 
-      // return view('telas_servidor.requisicoes_servidor', compact('titulo','listaRequisicao_documentos', 'quantidades'));
+        } else if ($request->titulo_id == 7) {
+            $titulo = 'Indeferidos';
+            //$id_documentos retorna um collection. É necessário transformar para array
+            //pega todas as requisições com base no id do documento e no id do curso
+            $id_documentos = DB::table('requisicao_documentos')
+                ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
+                ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
+                ->select('requisicao_documentos.id')
+                ->where([['curso_id', $request->curso_id], ['status', 'Indeferido']])
+                ->get();
 
-      return view('telas_servidor.requisicoes_servidor',
-             compact('titulo',
-                     'listaRequisicao_documentos',
-                     'cursos',
-                     'cursoSelecionado',
-                     'documentoSelecionado',
-                     'documentos'));
+        } else {
+            $titulo = $documento->tipo;
+            $id_documentos = DB::table('requisicao_documentos')
+                ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
+                ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
+                ->select('requisicao_documentos.id')
+                ->where([['documento_id', $request->titulo_id], ['curso_id', $request->curso_id], ['status', 'Em andamento']])
+                ->get();
+        }
+        $id = []; //array auxiliar que pega cada item do $id_documentos
+        foreach ($id_documentos as $id_documento) {
+            array_push($id, $id_documento->id); //passa o id de $id_documentos para o array auxiliar $id
+        }
+        $listaRequisicao_documentos = Requisicao_documento::whereIn('id', $id)->get(); //Pega as requisições que possuem o id do curso
+        $response = [];
+        foreach ($listaRequisicao_documentos as $key) {
+            if ($key->requisicao->perfil != null) {
+                array_push($response, ['id' => $key->id,
+                    'cpf' => $key->aluno->cpf,
+                    'perfil' => $key->aluno->perfil,
+                    'nome' => $key->aluno->user->name,
+                    'curso' => $key->requisicao->perfil->curso->nome,
+                    'email' => $key->aluno->user->email,
+                    'vinculo' => $key->requisicao->perfil->situacao,
+                    'status_data' => $key->status_data,
+                    'status_hora' => Requisicao::where('id', $key->requisicao_id)->get('hora_pedido')[0]->hora_pedido,
+                    'status' => $key->status,
+                    'detalhes' => $key->detalhes,
+                    'requisicoes_documentos' => $key
+                ]);
+            }
+        }
+        usort($response, function ($a, $b) {
+            return $a['nome'] >= $b['nome'];
+        });
+        $listaRequisicao_documentos = $response;
 
-  }
-    public function storeRequisicao(Request $request){
-      return redirect('confirmacao-requisicao');
+        // return view('telas_servidor.requisicoes_servidor', compact('titulo','listaRequisicao_documentos', 'quantidades'));
+
+        return view('telas_servidor.requisicoes_servidor',
+            compact('titulo',
+                'listaRequisicao_documentos',
+                'cursos',
+                'cursoSelecionado',
+                'documentoSelecionado',
+                'documentos'));
 
     }
-    public function preparaNovaRequisicao(Request $request){
-          $unidades = Unidade::All();
-          $usuarios = User::All();
-          $alunos = Aluno::All();
-          $perfis = Perfil::where('aluno_id', Auth::user()->aluno->id)->get();
-          return view('autenticacao.formulario-requisicao',compact('usuarios','unidades', 'perfis', 'alunos'));
-        }
-    public function novaRequisicao(Request $request){
-      $checkBoxDeclaracaoVinculo = $request->declaracaoVinculo;
-      $checkBoxComprovanteMatricula = $request->comprovanteMatricula;
-      $checkBoxHistorico = $request->historico;
-      $checkBoxProgramaDisciplina = $request->programaDisciplina;
-      $checkBoxOutros = $request->outros;
+
+    public function storeRequisicao(Request $request)
+    {
+        return redirect('confirmacao-requisicao');
+
+    }
+
+    public function preparaNovaRequisicao(Request $request)
+    {
+        $unidades = Unidade::All();
+        $usuarios = User::All();
+        $alunos = Aluno::All();
+        $perfis = Perfil::where('aluno_id', Auth::user()->aluno->id)->get();
+        return view('autenticacao.formulario-requisicao', compact('usuarios', 'unidades', 'perfis', 'alunos'));
+    }
+
+    public function preparaNovaRequisicaoBibli(Request $request)
+    {
+        $unidades = Unidade::All();
+        $usuarios = User::All();
+        $alunos = Aluno::All();
+        $perfis = Perfil::where('aluno_id', Auth::user()->aluno->id)->get();
+        return view('autenticacao.formulario-requisicao-bibli', compact('usuarios', 'unidades', 'perfis', 'alunos'));
+    }
+
+    public function cadastrarDocumento(Request $request)
+    {
+        $tipo_documento = $request->documento;
+        return view('telas_aluno.cadastrar_documento', ['tipo_documento' => $tipo_documento]);
+    }
+
+    public function novaRequisicao(Request $request)
+    {
+        $checkBoxDeclaracaoVinculo = $request->declaracaoVinculo;
+        $checkBoxComprovanteMatricula = $request->comprovanteMatricula;
+        $checkBoxHistorico = $request->historico;
+        $checkBoxProgramaDisciplina = $request->programaDisciplina;
+        $checkBoxOutros = $request->outros;
         $mensagens = [
-        'requisicaoPrograma.required' => 'Preencha este campo com as informações relativas à disciplina e a finalidade do pedido',
-        'requisicaoPrograma.max' => 'O campo só pode ter no máximo 190 caracteres',
-        'requisicaoOutros.max' => 'O campo só pode ter no máximo 190 caracteres'
+            'requisicaoPrograma.required' => 'Preencha este campo com as informações relativas à disciplina e a finalidade do pedido',
+            'requisicaoPrograma.max' => 'O campo só pode ter no máximo 190 caracteres',
+            'requisicaoOutros.max' => 'O campo só pode ter no máximo 190 caracteres'
         ];
 
-        if($checkBoxProgramaDisciplina!=''){
-          $request->validate([
-            'requisicaoPrograma' => ['required'],
-          ]);
-          $request->validate([
-            'requisicaoPrograma' => 'required|max:190'
-          ], $mensagens);
+        if ($checkBoxProgramaDisciplina != '') {
+            $request->validate([
+                'requisicaoPrograma' => ['required'],
+            ]);
+            $request->validate([
+                'requisicaoPrograma' => 'required|max:190'
+            ], $mensagens);
         }
-        if($checkBoxOutros!=''){
-          $request->validate([
-            'requisicaoOutros' => ['required'],
-          ]);
-          $request->validate([
-            'requisicaoOutros' => 'required|max:190'
-          ], $mensagens);
+        if ($checkBoxOutros != '') {
+            $request->validate([
+                'requisicaoOutros' => ['required'],
+            ]);
+            $request->validate([
+                'requisicaoOutros' => 'required|max:190'
+            ], $mensagens);
         }
         $requisicao = new Requisicao();
         $idUser = Auth::user()->id;
         $user = User::find($idUser); //Usuário Autenticado
-        $aluno = Aluno::where('user_id',$idUser)->first(); //Aluno autenticado
-        $perfil = Perfil::where('id',$request->default)->first();
+        $aluno = Aluno::where('user_id', $idUser)->first(); //Aluno autenticado
+        $perfil = Perfil::where('id', $request->default)->first();
         $arrayDocumentos = [];//Array Temporário
         date_default_timezone_set('America/Sao_Paulo');
         $date = date('d/m/Y');
-        $hour =  date('H:i');
+        $hour = date('H:i');
         $requisicao->data_pedido = $date;
         $requisicao->hora_pedido = $hour;
         $requisicao->perfil_id = $perfil->id;
         $requisicao->aluno_id = $aluno->id; //necessária adequação com o código de autenticação do usuário do perfil aluno
         $requisicao->save();
-      if($checkBoxDeclaracaoVinculo){
-        $texto = "";
-        array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 1, $perfil, $texto));
-      }
-      if($checkBoxComprovanteMatricula){
-        $texto = "";
-        array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 2, $perfil, $texto));
-      }
-      if($checkBoxHistorico){
-        $texto = "";
-        array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 3, $perfil, $texto));
-      }
-      if($checkBoxProgramaDisciplina){
-        $texto =  $request->get('requisicaoPrograma');
-        array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 4, $perfil, $texto));
-      }
-      if($checkBoxOutros){
-        $texto =  $request->get('requisicaoOutros');
-        array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 5, $perfil, $texto));
-      }
-      //#Documentos
-      $ano = date('Y');
-      $size = count($arrayDocumentos);
-      $requisicao->requisicao_documento()->saveMany($arrayDocumentos);
-          $id = [];
-          foreach ($arrayDocumentos as $key) {
+        if ($checkBoxDeclaracaoVinculo) {
+            $texto = "";
+            array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 1, $perfil, $texto));
+        }
+        if ($checkBoxComprovanteMatricula) {
+            $texto = "";
+            array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 2, $perfil, $texto));
+        }
+        if ($checkBoxHistorico) {
+            $texto = "";
+            array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 3, $perfil, $texto));
+        }
+        if ($checkBoxProgramaDisciplina) {
+            $texto = $request->get('requisicaoPrograma');
+            array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 4, $perfil, $texto));
+        }
+        if ($checkBoxOutros) {
+            $texto = $request->get('requisicaoOutros');
+            array_push($arrayDocumentos, RequisicaoController::requisitados($requisicao, 5, $perfil, $texto));
+        }
+        //#Documentos
+        $ano = date('Y');
+        $size = count($arrayDocumentos);
+        $requisicao->requisicao_documento()->saveMany($arrayDocumentos);
+        $id = [];
+        foreach ($arrayDocumentos as $key) {
             array_push($id, $key->documento_id);
-          }
-          $arrayAux = Documento::whereIn('id', $id)->get();
-          // $documento = Documento::where('id',$request->titulo_id)->first();
-          $curso = Curso::where('id',$request->curso_id)->first();
-          return view('autenticacao.confirmacao-requisicao', compact('arrayDocumentos', 'requisicao', 'arrayAux', 'size', 'ano', 'date', 'hour'));
+        }
+        $arrayAux = Documento::whereIn('id', $id)->get();
+        // $documento = Documento::where('id',$request->titulo_id)->first();
+        $curso = Curso::where('id', $request->curso_id)->first();
+        return view('autenticacao.confirmacao-requisicao', compact('arrayDocumentos', 'requisicao', 'arrayAux', 'size', 'ano', 'date', 'hour'));
     }
-    public function requisitados(Requisicao $requisicao, $id, Perfil $perfil, $texto){
-      date_default_timezone_set('America/Sao_Paulo');
-      $date = date('d/m/Y');
-      $hour =  date('H:i');
-      $documentosRequisitados = new Requisicao_documento();
-      $documentosRequisitados->status_data = $date;
-      $documentosRequisitados->requisicao_id = $requisicao->id;
-      $documentosRequisitados->aluno_id = $perfil->aluno_id;
-      $documentosRequisitados->status = 'Em andamento';
-      if($id === 4){
-          $documentosRequisitados->detalhes = $texto;
-      }
-      if($id===5){
-          $documentosRequisitados->detalhes =  $texto;
-      }
-      $documentosRequisitados->documento_id = $id;
-      $documentosRequisitados->detalhes =  $texto;
-      return $documentosRequisitados;
+
+    public function requisitados(Requisicao $requisicao, $id, Perfil $perfil, $texto)
+    {
+        date_default_timezone_set('America/Sao_Paulo');
+        $date = date('d/m/Y');
+        $hour = date('H:i');
+        $documentosRequisitados = new Requisicao_documento();
+        $documentosRequisitados->status_data = $date;
+        $documentosRequisitados->requisicao_id = $requisicao->id;
+        $documentosRequisitados->aluno_id = $perfil->aluno_id;
+        $documentosRequisitados->status = 'Em andamento';
+        if ($id === 4) {
+            $documentosRequisitados->detalhes = $texto;
+        }
+        if ($id === 5) {
+            $documentosRequisitados->detalhes = $texto;
+        }
+        $documentosRequisitados->documento_id = $id;
+        $documentosRequisitados->detalhes = $texto;
+        return $documentosRequisitados;
     }
-    public function confirmacaoRequisicao(Request $request){
-      return redirect('/autenticacao.confirmacao-requisicao');
+
+    public function confirmacaoRequisicao(Request $request)
+    {
+        return redirect('/autenticacao.confirmacao-requisicao');
     }
-    public function finalizaRequisicao(Request $request){
-      return redirect('/home-aluno');
+
+    public function finalizaRequisicao(Request $request)
+    {
+        return redirect('/home-aluno');
     }
-    public function cancelaRequisicao(){
-      return view('/autenticacao.home-aluno');
+
+    public function cancelaRequisicao()
+    {
+        return view('/autenticacao.home-aluno');
     }
-    public function listarRequisicoesAluno(){
-      $requisicao = Requisicao::paginate(10);
-      return view('/home-aluno')->with($requisicao);
+
+    public function listarRequisicoesAluno()
+    {
+        $requisicao = Requisicao::paginate(10);
+        return view('/home-aluno')->with($requisicao);
     }
-    public function indeferirRequisicao(Request $request){
+
+    public function indeferirRequisicao(Request $request)
+    {
         $request->validate([
-          'anotacoes' => ['required'],
+            'anotacoes' => ['required'],
         ]);
         $id = $request->idDocumento;
         $servidorLogado = Auth::user();
         $servidor = Servidor::where('user_id', $servidorLogado->id)->first();
         $id_documento = Requisicao_documento::where('id', $id)->first();
-            $id_documento->anotacoes = $request->anotacoes;
-            $id_documento->status = "Indeferido";
-            $id_documento->servidor_id = $servidor->id;
-            $aluno = Aluno::where('id', $id_documento->aluno_id)->first();
-            $user = User::where('id', $aluno->user_id)->first();
-            $documento = Documento::where('id', $id_documento->documento_id)->first();
-            $to_email = $user->email;
-            $nome_documento = $documento->tipo;
-            $data = array(
-                'usuario' => $user,
-                'aluno' => $aluno,
-                'servidor' => $servidor,
-                'documento' => $id_documento,
-                'nome_documento' => $nome_documento,
-                'anotacoes' => $id_documento->anotacoes,
-            );
-            $id_documento->save();
-            $subject = 'Solicita - Status da Requisicao: '.$id_documento->status;
+        $id_documento->anotacoes = $request->anotacoes;
+        $id_documento->status = "Indeferido";
+        $id_documento->servidor_id = $servidor->id;
+        $aluno = Aluno::where('id', $id_documento->aluno_id)->first();
+        $user = User::where('id', $aluno->user_id)->first();
+        $documento = Documento::where('id', $id_documento->documento_id)->first();
+        $to_email = $user->email;
+        $nome_documento = $documento->tipo;
+        $data = array(
+            'usuario' => $user,
+            'aluno' => $aluno,
+            'servidor' => $servidor,
+            'documento' => $id_documento,
+            'nome_documento' => $nome_documento,
+            'anotacoes' => $id_documento->anotacoes,
+        );
+        $id_documento->save();
+        $subject = 'Solicita - Status da Requisicao: ' . $id_documento->status;
 
 
-            $details = ['data'=>$data, 'cabecalho'=>'naoresponder.lmts@gmail.com', 'titulo'=>'Solicita - LMTS', 'toEmail'=>$to_email, 'subject'=>$subject];
+        $details = ['data' => $data, 'cabecalho' => 'naoresponder.lmts@gmail.com', 'titulo' => 'Solicita - LMTS', 'toEmail' => $to_email, 'subject' => $subject];
 
-            SendEmail::dispatch($details);
+        SendEmail::dispatch($details);
         return redirect()->back()->with('success', 'Documento(s) Indeferidos(s) com Sucesso!'); //volta pra mesma url
-      }
-      public function concluirRequisicao(Request $request){
-          $servidorLogado = Auth::user();
-          $servidor = Servidor::where('user_id', $servidorLogado->id)->first();
-          $arrayDocumentos = $request->checkboxLinha;
-          $id_documentos = Requisicao_documento::find($arrayDocumentos);//whereIn
-          if(isset($id_documentos)){
+    }
+
+    public function concluirRequisicao(Request $request)
+    {
+        $servidorLogado = Auth::user();
+        $servidor = Servidor::where('user_id', $servidorLogado->id)->first();
+        $arrayDocumentos = $request->checkboxLinha;
+        $id_documentos = Requisicao_documento::find($arrayDocumentos);//whereIn
+        if (isset($id_documentos)) {
             foreach ($id_documentos as $id_documento) {
-              $id_documento->status = "Concluído - Disponível para retirada";
-              $id_documento->servidor_id = $servidor->id;
-              $aluno = Aluno::where('id', $id_documento->aluno_id)->first();
-              $user = User::where('id', $aluno->user_id)->first();
-              $documento = Documento::where('id', $id_documento->documento_id)->first();
-              $to_email = $user->email;
-              $nome_documento = $documento->tipo;
-              $data = array(
-                  'usuario' => $user,
-                  'aluno' => $aluno,
-                  'servidor' => $servidor,
-                  'documento' => $id_documento,
-                  'nome_documento' => $nome_documento,
-                  'anotacoes' => $id_documento->anotacoes,
-              );
-              $id_documento->save();
-              $subject = 'Solicita - Status da Requisicao: '.$id_documento->status;
+                $id_documento->status = "Concluído - Disponível para retirada";
+                $id_documento->servidor_id = $servidor->id;
+                $aluno = Aluno::where('id', $id_documento->aluno_id)->first();
+                $user = User::where('id', $aluno->user_id)->first();
+                $documento = Documento::where('id', $id_documento->documento_id)->first();
+                $to_email = $user->email;
+                $nome_documento = $documento->tipo;
+                $data = array(
+                    'usuario' => $user,
+                    'aluno' => $aluno,
+                    'servidor' => $servidor,
+                    'documento' => $id_documento,
+                    'nome_documento' => $nome_documento,
+                    'anotacoes' => $id_documento->anotacoes,
+                );
+                $id_documento->save();
+                $subject = 'Solicita - Status da Requisicao: ' . $id_documento->status;
 
-              $details = ['data'=>$data, 'cabecalho'=>'naoresponder.lmts@gmail.com', 'titulo'=>'Solicita - LMTS', 'toEmail'=>$to_email, 'subject'=>$subject];
+                $details = ['data' => $data, 'cabecalho' => 'naoresponder.lmts@gmail.com', 'titulo' => 'Solicita - LMTS', 'toEmail' => $to_email, 'subject' => $subject];
 
-              SendEmail::dispatch($details);
+                SendEmail::dispatch($details);
 
             }
-          }
-          return redirect()->back()->with('success', 'Documento(s) Concluido(s) com Sucesso!'); //volta pra mesma url
-      }
+        }
+        return redirect()->back()->with('success', 'Documento(s) Concluido(s) com Sucesso!'); //volta pra mesma url
+    }
 
-      public function exibirBusca(){
+    public function exibirBusca()
+    {
         return view('telas_servidor.relatorio_servidor');
-      }
+    }
 
-      public function gerarRelatorio(Request $request){
+    public function gerarRelatorio(Request $request)
+    {
 
         $mensagens = [
-        'dataInicio.date' => 'Preencha este campo com as informações relativas à disciplina e a finalidade do pedido',
-        'dataFim.after_or_equal' => 'A data final deve ser uma data posterior ou igual a data de inicio',
-        'dataInicio.before_or_equal' => 'A data de inicio deve ser uma data antes ou igual a hoje.'
+            'dataInicio.date' => 'Preencha este campo com as informações relativas à disciplina e a finalidade do pedido',
+            'dataFim.after_or_equal' => 'A data final deve ser uma data posterior ou igual a data de inicio',
+            'dataInicio.before_or_equal' => 'A data de inicio deve ser uma data antes ou igual a hoje.'
         ];
 
         $request->validate([
-          'dataInicio'       => 'date |before_or_equal:today',
-          'dataFim'          => 'date|after_or_equal:dataInicio',
+            'dataInicio' => 'date |before_or_equal:today',
+            'dataFim' => 'date|after_or_equal:dataInicio',
         ], $mensagens);
 
         $id_documentos = DB::table('requisicao_documentos')
-                ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
-                ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
-                ->select ('requisicao_documentos.id')
-                ->whereDate('status_data', '>=', $request->dataInicio)
-                ->whereDate('status_data', '<=', $request->dataFim)
-                ->get();
+            ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
+            ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
+            ->select('requisicao_documentos.id')
+            ->whereDate('status_data', '>=', $request->dataInicio)
+            ->whereDate('status_data', '<=', $request->dataFim)
+            ->get();
 
 
         //var_dump($id_documentos);
         $id = []; //array auxiliar que pega cada item do $id_documentos
         foreach ($id_documentos as $id_documento) {
-          array_push($id, $id_documento->id); //passa o id de $id_documentos para o array auxiliar $id
+            array_push($id, $id_documento->id); //passa o id de $id_documentos para o array auxiliar $id
         }
         $listaRequisicao_documentos = Requisicao_documento::whereIn('id', $id)->get(); //Pega as requisições que possuem o id do curso
 
         $contadorDeclaracaoVinculo = 0;
         $contadorComprovanteMatricula = 0;
-        $contadorHistorico  = 0;
+        $contadorHistorico = 0;
         $contadorProgramaDisciplina = 0;
         $contadorOutros = 0;
 
-        foreach($listaRequisicao_documentos as $key){
-          if($key->documento_id == 1){
-            $contadorDeclaracaoVinculo++;
-          }
-          if($key->documento_id == 2){
-            $contadorComprovanteMatricula++;
-          }
-          if($key->documento_id == 3){
-            $contadorHistorico++;
-          }
-          if($key->documento_id == 4){
-            $contadorProgramaDisciplina++;
-          }
-          if($key->documento_id == 5){
-            $contadorOutros++;
-          }
+        foreach ($listaRequisicao_documentos as $key) {
+            if ($key->documento_id == 1) {
+                $contadorDeclaracaoVinculo++;
+            }
+            if ($key->documento_id == 2) {
+                $contadorComprovanteMatricula++;
+            }
+            if ($key->documento_id == 3) {
+                $contadorHistorico++;
+            }
+            if ($key->documento_id == 4) {
+                $contadorProgramaDisciplina++;
+            }
+            if ($key->documento_id == 5) {
+                $contadorOutros++;
+            }
         }
 
         $total = $contadorDeclaracaoVinculo +
-                 $contadorComprovanteMatricula +
-                 $contadorHistorico +
-                 $contadorProgramaDisciplina +
-                 $contadorOutros;
+            $contadorComprovanteMatricula +
+            $contadorHistorico +
+            $contadorProgramaDisciplina +
+            $contadorOutros;
         return view('telas_servidor.relatorio_servidor'
-          ,compact( 'contadorDeclaracaoVinculo',
-                    'contadorComprovanteMatricula',
-                    'contadorHistorico',
-                    'contadorProgramaDisciplina',
-                    'contadorOutros',
-                    'total'
-                  ));
-      }
-      public function exibirPesquisa(){
-        return view('telas_servidor.pesquisa_servidor');
-      }
+            , compact('contadorDeclaracaoVinculo',
+                'contadorComprovanteMatricula',
+                'contadorHistorico',
+                'contadorProgramaDisciplina',
+                'contadorOutros',
+                'total'
+            ));
+    }
 
-      public function pesquisarAluno(Request $request){
+    public function exibirPesquisa()
+    {
+        return view('telas_servidor.pesquisa_servidor');
+    }
+
+    public function pesquisarAluno(Request $request)
+    {
         $RequestNome = $request->input('formNome') . '%';
         $RequestCPF = $request->input('formCPF');
         $alunos = [];
 
-        if($request->input('formNome') != ''){
-          $alunos = DB::table('users')
+        if ($request->input('formNome') != '') {
+            $alunos = DB::table('users')
                 ->join('alunos', 'alunos.user_id', '=', 'users.id')
-                ->select ('users.name', 'users.email','alunos.cpf', 'users.id' )
-                ->where('name','like', $RequestNome)
+                ->select('users.name', 'users.email', 'alunos.cpf', 'users.id')
+                ->where('name', 'like', $RequestNome)
                 ->get();
-        }else if($request->input('formCPF') != '' ){
-          $alunos = DB::table('users')
+        } else if ($request->input('formCPF') != '') {
+            $alunos = DB::table('users')
                 ->join('alunos', 'alunos.user_id', '=', 'users.id')
-                ->select ('users.name', 'users.email','alunos.cpf', 'users.id' )
-                ->where('cpf','like', $RequestCPF)
+                ->select('users.name', 'users.email', 'alunos.cpf', 'users.id')
+                ->where('cpf', 'like', $RequestCPF)
                 ->get();
         }
 
 
         return view('telas_servidor.pesquisa_servidor', compact('alunos'));
 
-      }
+    }
 
 }
 
 
-      //   $documento = Documento::where('id',$request->tipoDocumento_id)->first();
-      //   $qtdDeclaracaoVinculo = DB::table('requisicao_documentos')
-      //           ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
-      //           ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
-      //           ->select ('requisicao_documentos.id')
-      //           ->where([['requisicao_documentos.documento_id','1']])
-      //           ->get();
+//   $documento = Documento::where('id',$request->tipoDocumento_id)->first();
+//   $qtdDeclaracaoVinculo = DB::table('requisicao_documentos')
+//           ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
+//           ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
+//           ->select ('requisicao_documentos.id')
+//           ->where([['requisicao_documentos.documento_id','1']])
+//           ->get();
 
-      //   $id_documentos = $id_documentos->count();
+//   $id_documentos = $id_documentos->count();
 
 
-      //   return view('telas_servidor.relatorio_servidor',compact('qtdDeclaracaoVinculo'));
-      // }
+//   return view('telas_servidor.relatorio_servidor',compact('qtdDeclaracaoVinculo'));
+// }

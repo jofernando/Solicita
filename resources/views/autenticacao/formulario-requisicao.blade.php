@@ -12,7 +12,7 @@
         <div class="card-body">
 
             <div class="row justify-content-center">
-                <h2>Solicitar Documentos</h2>
+                <h2>Solicitar Documentos Escolaridade</h2>
             </div>
             <form method="POST" enctype="multipart/form-data" id="formRequisicao" action="{{ route('confirmacao-requisicao') }}">
               @csrf

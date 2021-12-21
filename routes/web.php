@@ -67,7 +67,11 @@ Route::group(['middleware'=> 'CheckAluno'], function(){
     Route::post('/finaliza-requisicao', [\App\Http\Controllers\RequisicaoController::class, 'finalizaRequisicao'])->name('finaliza-requisicao')->middleware('CheckAluno');
     Route::get('/cancela-requisicao', [\App\Http\Controllers\RequisicaoController::class, 'cancelaRequisicao'])->name('cancela-requisicao')->middleware('CheckAluno');
     Route::get('/prepara-requisicao', [\App\Http\Controllers\RequisicaoController::class, 'preparaNovaRequisicao'])->name('prepara-requisicao')->middleware('CheckAluno');
+    Route::get('/prepara-requisicao-bibli', [\App\Http\Controllers\RequisicaoController::class, 'preparaNovaRequisicaoBibli'])->name('prepara-requisicao-bibli');
     Route::post('/excluir-requisicao/{id}',[\App\Http\Controllers\RequisicaoController::class, 'excluirRequisicao'])->name('excluir-requisicao');
+
+    Route::post('/cadastrar-documento-bibli', [\App\Http\Controllers\RequisicaoController::class, 'cadastrarDocumento'])->name('cadastrarDocumento');
+
     Route::get('/confirmacao-requisicao',function(){
         return view('autenticacao.confirmacao-requisicao');
     })->name('confirmacao-requisicao')->middleware('CheckAluno');
