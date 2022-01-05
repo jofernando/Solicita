@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
-use App\Perfil;
-use App\Aluno;
-use App\Curso;
+use App\Models\User;
+use App\Models\Perfil;
+use App\Models\Aluno;
+use App\Models\Curso;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;

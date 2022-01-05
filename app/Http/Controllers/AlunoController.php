@@ -7,15 +7,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-use App\Curso;
-use App\Aluno;
-use App\User;
-use App\Perfil;
-use App\Unidade;
-use App\Servidor;
-use App\Requisicao;
-use App\Documento;
-use App\Requisicao_documento;
+use App\Models\Curso;
+use App\Models\Aluno;
+use App\Models\User;
+use App\Models\Perfil;
+use App\Models\Unidade;
+use App\Models\Servidor;
+use App\Models\Requisicao;
+use App\Models\Documento;
+use App\Models\Requisicao_documento;
 
 class AlunoController extends Controller
 {
@@ -30,8 +30,8 @@ class AlunoController extends Controller
   }
   //redireciona para a lista de requisições do aluno
   //devolve para a view a lista de requisicoes que o aluno fez
-  public function listarRequisicoes(){    
-    $idUser=Auth::user()->id;        
+  public function listarRequisicoes(){
+    $idUser=Auth::user()->id;
     $aluno = Aluno::where('user_id',$idUser)->first();
     //ordena pela data e hora do pedido
     // $requisicoes = Requisicao::where('aluno_id',$aluno->id)->orderBy('data_pedido','desc')->orderBy('hora_pedido', 'desc')->get();

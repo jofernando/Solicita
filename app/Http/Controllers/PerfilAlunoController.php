@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Curso;
-use App\Unidade;
-use App\User;
-use App\Aluno;
-use App\Perfil;
-use App\Requisicao;
-use App\Requisicao_documento;
+use App\Models\Curso;
+use App\Models\Unidade;
+use App\Models\User;
+use App\Models\Aluno;
+use App\Models\Perfil;
+use App\Models\Requisicao;
+use App\Models\Requisicao_documento;
 use Auth;
 
 class PerfilAlunoController extends Controller
@@ -164,7 +164,7 @@ class PerfilAlunoController extends Controller
   return redirect()->route('perfil-aluno')->with('success', 'Perfil adicionado com sucesso!');
 }
 public function excluirPerfil(Request $request) {
-      
+
 
       if($request->idPerfil==null){
         return redirect()->back()->with('error', 'Selecione o perfil que deseja excluir');
@@ -172,7 +172,7 @@ public function excluirPerfil(Request $request) {
       $usuario = User::find(Auth::user()->id);
       $aluno = $usuario->aluno;
       $perfis = Perfil::where('aluno_id',$aluno->id)->get();
-      
+
 
       $quant = count($perfis);
       if($quant===1){
@@ -182,7 +182,7 @@ public function excluirPerfil(Request $request) {
         // Requisições do perfil selecionado para deletar
         $requisicoes = Requisicao::where('perfil_id',$request->idPerfil)->get();
         foreach ($requisicoes as $requisicao) {
-          
+
           $requisicao_documento = Requisicao_Documento::where('requisicao_id',$requisicao->id)->get();
           foreach ($requisicao_documento as $rd) {
             if($rd->status == "Em andamento"){
@@ -230,7 +230,7 @@ public function excluirPerfil(Request $request) {
             }
           }
           $perfil->delete();
-          
+
           // dd($perfil);
         }
         return redirect()->back()->with('success', 'Deletado com Sucesso!');

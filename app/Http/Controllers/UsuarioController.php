@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Curso;
-use App\Aluno;
-use App\User;
-use App\Perfil;
-use App\Unidade;
+use App\Models\Curso;
+use App\Models\Aluno;
+use App\Models\User;
+use App\Models\Perfil;
+use App\Models\Unidade;
 
 class UsuarioController extends Controller
 {

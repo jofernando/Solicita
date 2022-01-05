@@ -24,9 +24,6 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
-
-        
-
         $usuario = new User();
         $aluno = new Aluno();
         $perfil = new Perfil();
@@ -76,7 +73,7 @@ class AuthController extends Controller
         $perfil->curso_id = $curso->id;
         $perfil->valor = true;
         $perfil->save();
-        
+
 
         // $user = User::create([
         //      'email'    => $request->email,

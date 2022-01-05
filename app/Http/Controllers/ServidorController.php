@@ -4,16 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Curso;
-use App\User;
-use App\Servidor;
-use App\Unidade;
+use App\Models\Curso;
+use App\Models\User;
+use App\Models\Servidor;
+use App\Models\Unidade;
 
-use App\Aluno;
-use App\Perfil;
-use App\Requisicao;
-use App\Documento;
-use App\Requisicao_documento;
+use App\Models\Aluno;
+use App\Models\Perfil;
+use App\Models\Requisicao;
+use App\Models\Documento;
+use App\Models\Requisicao_documento;
 use Auth;
 
 class ServidorController extends Controller
@@ -24,7 +24,7 @@ class ServidorController extends Controller
         return view('telas_servidor.home_servidor', ['cursos'=>$cursos,'tipoDocumento'=>$tipoDocumento]);
     }
     public function listarRequisicoes($id){
-      $idUser=$id;      
+      $idUser=$id;
       $aluno = Aluno::where('user_id',$idUser)->first();
       //ordena pela data e hora do pedido
       // $requisicoes = Requisicao::where('aluno_id',$aluno->id)->orderBy('data_pedido','desc')->orderBy('hora_pedido', 'desc')->get();

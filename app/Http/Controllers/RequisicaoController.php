@@ -7,16 +7,16 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Mail;
 use App\Mail\StatusMail;
-use App\Requisicao_documento;
-use App\Requisicao;
-use App\Documento;
-use App\Curso;
-use App\Aluno;
-use App\Perfil;
-use App\User;
+use App\Models\Requisicao_documento;
+use App\Models\Requisicao;
+use App\Models\Documento;
+use App\Models\Curso;
+use App\Models\Aluno;
+use App\Models\Perfil;
+use App\Models\User;
 use Carbon\Carbon;
-use App\Servidor;
-use App\Unidade;
+use App\Models\Servidor;
+use App\Models\Unidade;
 use App\Jobs\SendEmail;
 
 class RequisicaoController extends Controller
@@ -29,7 +29,7 @@ class RequisicaoController extends Controller
   public function excluirRequisicao($id){
     $requisicao = Requisicao::find($id);
     $documentos = $requisicao->requisicao_documento()->get();
-    
+
     foreach ($documentos as $doc) {
       # code...
       if($doc->status != 'Em andamento'){
@@ -43,7 +43,7 @@ class RequisicaoController extends Controller
 
   public function getRequisicoes(Request $request){
     //$documento = Documento::where('id',$request->documento_id)->first();
-    $documento = Documento::where('id',$request->titulo_id)->first();    
+    $documento = Documento::where('id',$request->titulo_id)->first();
     $curso = Curso::where('id',$request->curso_id)->first();
     $cursoSelecionado = Curso::where('id',$request->curso_id)->first();
     $documentoSelecionado = Documento::where('id',$request->titulo_id)->first();
@@ -59,7 +59,7 @@ class RequisicaoController extends Controller
                   ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
                   ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
                   ->select ('requisicao_documentos.id')
-                  ->where([['curso_id', $request->curso_id],['status','Concluído - Disponível para retirada']])                  
+                  ->where([['curso_id', $request->curso_id],['status','Concluído - Disponível para retirada']])
                   ->get();
 
       }
@@ -71,7 +71,7 @@ class RequisicaoController extends Controller
                   ->join('requisicaos', 'requisicaos.id', '=', 'requisicao_documentos.requisicao_id')
                   ->join('perfils', 'requisicaos.perfil_id', '=', 'perfils.id')
                   ->select ('requisicao_documentos.id')
-                  ->where([['curso_id', $request->curso_id],['status','Indeferido']])                 
+                  ->where([['curso_id', $request->curso_id],['status','Indeferido']])
                   ->get();
 
       }
@@ -109,7 +109,7 @@ class RequisicaoController extends Controller
       }
       usort($response, function($a, $b){ return $a['nome'] >= $b['nome']; });
       $listaRequisicao_documentos = $response;
-      
+
       // return view('telas_servidor.requisicoes_servidor', compact('titulo','listaRequisicao_documentos', 'quantidades'));
 
       return view('telas_servidor.requisicoes_servidor',
@@ -143,7 +143,7 @@ class RequisicaoController extends Controller
         'requisicaoPrograma.max' => 'O campo só pode ter no máximo 190 caracteres',
         'requisicaoOutros.max' => 'O campo só pode ter no máximo 190 caracteres'
         ];
-        
+
         if($checkBoxProgramaDisciplina!=''){
           $request->validate([
             'requisicaoPrograma' => ['required'],
@@ -317,7 +317,7 @@ class RequisicaoController extends Controller
         'dataFim.after_or_equal' => 'A data final deve ser uma data posterior ou igual a data de inicio',
         'dataInicio.before_or_equal' => 'A data de inicio deve ser uma data antes ou igual a hoje.'
         ];
-        
+
         $request->validate([
           'dataInicio'       => 'date |before_or_equal:today',
           'dataFim'          => 'date|after_or_equal:dataInicio',
@@ -338,7 +338,7 @@ class RequisicaoController extends Controller
           array_push($id, $id_documento->id); //passa o id de $id_documentos para o array auxiliar $id
         }
         $listaRequisicao_documentos = Requisicao_documento::whereIn('id', $id)->get(); //Pega as requisições que possuem o id do curso
-        
+
         $contadorDeclaracaoVinculo = 0;
         $contadorComprovanteMatricula = 0;
         $contadorHistorico  = 0;
@@ -362,7 +362,7 @@ class RequisicaoController extends Controller
             $contadorOutros++;
           }
         }
-        
+
         $total = $contadorDeclaracaoVinculo +
                  $contadorComprovanteMatricula +
                  $contadorHistorico +
@@ -385,7 +385,7 @@ class RequisicaoController extends Controller
         $RequestNome = $request->input('formNome') . '%';
         $RequestCPF = $request->input('formCPF');
         $alunos = [];
-        
+
         if($request->input('formNome') != ''){
           $alunos = DB::table('users')
                 ->join('alunos', 'alunos.user_id', '=', 'users.id')
@@ -400,7 +400,7 @@ class RequisicaoController extends Controller
                 ->get();
         }
 
-      
+
         return view('telas_servidor.pesquisa_servidor', compact('alunos'));
 
       }
@@ -417,7 +417,7 @@ class RequisicaoController extends Controller
       //           ->get();
 
       //   $id_documentos = $id_documentos->count();
-        
+
 
       //   return view('telas_servidor.relatorio_servidor',compact('qtdDeclaracaoVinculo'));
       // }
